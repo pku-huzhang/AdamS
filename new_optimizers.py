@@ -4,7 +4,7 @@ from typing import Tuple
 
 
 class AdamS(Optimizer):
-    def __init__(self, named_parameters=required, lr=3e-4, betas=(0.9, 0.95), eps=1e-8,
+    def __init__(self, optim_groups, lr=3e-4, betas=(0.9, 0.95), eps=1e-8,
                  weight_decay=0.1):
         if lr < 0.0:
             raise ValueError(f"Invalid learning rate: {lr}")
@@ -14,23 +14,6 @@ class AdamS(Optimizer):
             raise ValueError(f"Invalid beta2: {betas[1]}")
         if eps < 0.0:
             raise ValueError(f"Invalid eps: {eps}")
-
-
-        optim_groups = []
-
-        for param_name, param in named_parameters:
-            param_name = param_name.lower()
-            if not param.requires_grad:
-                continue
-            state = {}
-            state["name"] = param_name
-            state["params"] = param
-            if "norm" in param_name or "ln" in param_name or "bias" in param_name:
-                state["weight_decay"] = 0.0
-            else:
-                state["weight_decay"] = weight_decay
-
-            optim_groups.append(state)
 
         defaults = dict(lr=lr, beta1=betas[0], beta2=betas[1], eps=eps)
         super().__init__(optim_groups, defaults)
@@ -98,31 +81,15 @@ class AdamS(Optimizer):
 class Lion(Optimizer):
     def __init__(
         self,
-        params,
+        optim_groups,
         lr: float = 3e-5,
         betas: Tuple[float, float] = (0.95, 0.98),
         weight_decay: float = 1.0,
-        named_parameters=required
     ):
         assert lr > 0.
         assert all([0. <= beta <= 1. for beta in betas])
 
 
-        optim_groups = []
-        for param_name, param in named_parameters:
-            param_name = param_name.lower()
-            if not param.requires_grad:
-                continue
-            state = {}
-            state["name"] = param_name
-            state["params"] = param
-            if "norm" in param_name or "ln" in param_name or "bias" in param_name:
-                state["weight_decay"] = 0.0
-            else:
-                state["weight_decay"] = weight_decay
-
-            optim_groups.append(state)
-        
         defaults = dict(
             lr = lr,
             betas = betas,
