@@ -4,7 +4,7 @@ from typing import Tuple
 
 
 class AdamS(Optimizer):
-    def __init__(self, optim_groups, lr=3e-4, betas=(0.9, 0.95), eps=1e-8,
+    def __init__(self, optim_groups, lr=3e-4, betas=(0.9, 0.95), eps=1e-6,
                  weight_decay=0.1):
         if lr < 0.0:
             raise ValueError(f"Invalid learning rate: {lr}")
@@ -128,4 +128,5 @@ class Lion(Optimizer):
                 exp_avg.mul_(beta2).add_(grad, alpha = 1 - beta2)
 
         return loss
+
 
